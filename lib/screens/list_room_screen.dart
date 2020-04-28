@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flash_chat/screens/chat_screen.dart';
+import 'package:flash_chat/screens/welcome_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 
@@ -22,6 +23,7 @@ class _ListRoomScreenState extends State<ListRoomScreen> {
     Alert(
       context: context,
       title: 'Create New Room',
+      style: AlertStyle(titleStyle: TextStyle(color: Colors.white)),
       content: TextField(
         onChanged: (value) {
           roomName = value;
@@ -50,6 +52,29 @@ class _ListRoomScreenState extends State<ListRoomScreen> {
       appBar: AppBar(
         title: Text('List Room'),
         centerTitle: true,
+        automaticallyImplyLeading: false,
+        actions: <Widget>[
+          Center(
+            child: Padding(
+              padding: EdgeInsets.only(right: 8),
+              child: GestureDetector(
+                onTap: () {
+                  Navigator.pushAndRemoveUntil(
+                      context,
+                      MaterialPageRoute(builder: (context) => WelcomeScreen()),
+                      (Route<dynamic> route) => false);
+                },
+                child: Text(
+                  'Sign Out',
+                  style: TextStyle(
+                      color: Colors.lightBlue,
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold),
+                ),
+              ),
+            ),
+          )
+        ],
       ),
       body: SafeArea(
         child: RoomStream(),
