@@ -142,49 +142,47 @@ class _ChatScreenState extends State<ChatScreen> {
               stream: Firestore.instance
                   .collection('messages')
                   .orderBy('timestamp')
-                  .where('roomId', isEqualTo: widget.roomId)                   
+                  .where('roomId', isEqualTo: widget.roomId)
                   .snapshots(),
               builder: (BuildContext context,
                   AsyncSnapshot<QuerySnapshot> snapshot) {
                 if (snapshot.hasData) {
                   final messages = snapshot.data.documents;
-                messageBubbles = [];
-                for (var message in messages) {
-                  final messageText = message.data['text'];
-                  final messageSender = message.data['sender'];
-                  final List<dynamic> images = message.data['image'];
-                  final currentUser = loggedInUser.email;
-                  final messageBubble = MessageBubble(
-                    sender: messageSender,
-                    text: (messageText != null) ? messageText : '',
-                    isMe: currentUser == messageSender,
-                    context: context,
-                    imagesList:
-                        (images != null || images.length != 0) ? images : [],
-                    onDeleteMessage: () {
-                      Firestore.instance
-                          .collection('messages')
-                          .document(message.documentID)
-                          .delete();
-                      setState(() {});
-                    },
-                  );
+                  messageBubbles = [];
+                  for (var message in messages) {
+                    final messageText = message.data['text'];
+                    final messageSender = message.data['sender'];
+                    final List<dynamic> images = message.data['image'];
+                    final currentUser = loggedInUser.email;
+                    final messageBubble = MessageBubble(
+                      sender: messageSender,
+                      text: (messageText != null) ? messageText : '',
+                      isMe: currentUser == messageSender,
+                      context: context,
+                      imagesList:
+                          (images != null || images.length != 0) ? images : [],
+                      onDeleteMessage: () {
+                        Firestore.instance
+                            .collection('messages')
+                            .document(message.documentID)
+                            .delete();
+                        setState(() {});
+                      },
+                    );
 
-                  messageBubbles.add(messageBubble);
+                    messageBubbles.add(messageBubble);
+                  }
+                  return Expanded(
+                    child: ListView(
+                      reverse: false,
+                      padding: EdgeInsets.symmetric(
+                          horizontal: 10.0, vertical: 20.0),
+                      children: messageBubbles,
+                    ),
+                  );
+                } else {
+                  return Container();
                 }
-                return Expanded(
-                  child: ListView(
-                    reverse: false,
-                    padding:
-                        EdgeInsets.symmetric(horizontal: 10.0, vertical: 20.0),
-                    children: messageBubbles,
-                  ),
-                );
-                 
-                } else{
- return Container();
-                }
-                
               },
             ),
             //TODO: Image holder
@@ -231,22 +229,24 @@ class _ChatScreenState extends State<ChatScreen> {
                         });
                         Firestore.instance.collection('messages').add({
                           'roomId': widget.roomId,
-                          'text': messageText,
+                          'text': messageTextController.text,
                           'sender': loggedInUser.email,
                           'image': listImages,
                           'timestamp':
                               DateTime.now().toUtc().millisecondsSinceEpoch
                         });
-                      } else {
+                      } else if (messageTextController.text != null &&
+                          messageTextController.text != '') {
                         Firestore.instance.collection('messages').add({
                           'roomId': widget.roomId,
-                          'text': messageText,
+                          'text': messageTextController.text,
                           'sender': loggedInUser.email,
                           'image': [],
                           'timestamp':
                               DateTime.now().toUtc().millisecondsSinceEpoch
                         });
                       }
+
                       messageTextController.clear();
                       setState(() {});
                     },
