@@ -118,7 +118,7 @@ class RoomStream extends StatelessWidget {
             listFlatRoom.add(roomFlat);
           }
           return ListView(
-            children: listFlatRoom,
+            children: listFlatRoom.reversed.toList(),
           );
         } else {
           return Center(child: CircularProgressIndicator());

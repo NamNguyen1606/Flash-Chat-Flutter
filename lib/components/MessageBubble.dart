@@ -29,7 +29,7 @@ class MessageBubble extends StatelessWidget {
         secondaryActions: (isMe)
             ? <Widget>[
                 IconSlideAction(
-                  caption: 'Chat',
+                  caption: 'Delete',
                   color: Colors.red,
                   icon: Icons.delete,
                   onTap: () {

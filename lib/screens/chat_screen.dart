@@ -81,7 +81,7 @@ class _ChatScreenState extends State<ChatScreen> {
     );
   }
 
-  //TODO Save Image to Firebase Storage
+  //TODO Save Image to Firebase 6
   Future saveImage(List<Asset> asset) async {
     StorageUploadTask uploadTask;
     List<String> linkImage = [];
@@ -129,14 +129,6 @@ class _ChatScreenState extends State<ChatScreen> {
     return Scaffold(
       appBar: AppBar(
         leading: null,
-//        actions: <Widget>[
-//          IconButton(
-//              icon: Icon(Icons.close),
-//              onPressed: () {
-//                _auth.signOut();
-//                Navigator.pop(context);
-//              }),
-//        ],
         title: Text(widget.roomName),
         centerTitle: true,
       ),
@@ -150,21 +142,18 @@ class _ChatScreenState extends State<ChatScreen> {
               stream: Firestore.instance
                   .collection('messages')
                   .orderBy('timestamp')
-                  .where('roomId', isEqualTo: widget.roomId)
+                  .where('roomId', isEqualTo: widget.roomId)                   
                   .snapshots(),
               builder: (BuildContext context,
                   AsyncSnapshot<QuerySnapshot> snapshot) {
-                if (!snapshot.hasData) {
-                  return Container();
-                }
-                final messages = snapshot.data.documents.reversed;
+                if (snapshot.hasData) {
+                  final messages = snapshot.data.documents;
                 messageBubbles = [];
                 for (var message in messages) {
                   final messageText = message.data['text'];
                   final messageSender = message.data['sender'];
                   final List<dynamic> images = message.data['image'];
                   final currentUser = loggedInUser.email;
-
                   final messageBubble = MessageBubble(
                     sender: messageSender,
                     text: (messageText != null) ? messageText : '',
@@ -185,12 +174,17 @@ class _ChatScreenState extends State<ChatScreen> {
                 }
                 return Expanded(
                   child: ListView(
-                    reverse: true,
+                    reverse: false,
                     padding:
                         EdgeInsets.symmetric(horizontal: 10.0, vertical: 20.0),
                     children: messageBubbles,
                   ),
                 );
+                 
+                } else{
+ return Container();
+                }
+                
               },
             ),
             //TODO: Image holder
@@ -231,6 +225,10 @@ class _ChatScreenState extends State<ChatScreen> {
                     onPressed: () async {
                       if (images.length != 0) {
                         List<String> listImages = await saveImage(images);
+                        messageTextController.clear();
+                        setState(() {
+                          images.clear();
+                        });
                         Firestore.instance.collection('messages').add({
                           'roomId': widget.roomId,
                           'text': messageText,
@@ -249,10 +247,8 @@ class _ChatScreenState extends State<ChatScreen> {
                               DateTime.now().toUtc().millisecondsSinceEpoch
                         });
                       }
-                      setState(() {
-                        messageTextController.clear();
-                        images.clear();
-                      });
+                      messageTextController.clear();
+                      setState(() {});
                     },
                     child: Text(
                       'Send',
